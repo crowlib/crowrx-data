@@ -1,7 +1,6 @@
 {
   "dependencies": {
     "com.crowlib.crowrx": "https://github.com/crowlib/crowrx.git?path=src/CrowRx.Unity/Assets/CrowRx",
-    "com.crowlib.crowrx.common": "https://github.com/crowlib/crowrx-common.git?path=src/CrowRx.Common.Unity/Assets/CrowRx.Common",
     "com.cysharp.r3": "https://github.com/Cysharp/R3.git?path=src/R3.Unity/Assets/R3.Unity",
     "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask",
     "com.cysharp.zlinq": "https://github.com/Cysharp/ZLinq.git?path=src/ZLinq.Unity/Assets/ZLinq.Unity",

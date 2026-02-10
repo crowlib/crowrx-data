@@ -11,13 +11,6 @@
       },
       "hash": "5936065a6d440b4524488b73955ead939ae74c37"
     },
-    "com.crowlib.crowrx.common": {
-      "version": "https://github.com/crowlib/crowrx-common.git?path=src/CrowRx.Common.Unity/Assets/CrowRx.Common",
-      "depth": 0,
-      "source": "git",
-      "dependencies": {},
-      "hash": "973618bdff5b9ad07730eb9041785f793ff22e1e"
-    },
     "com.cysharp.r3": {
       "version": "https://github.com/Cysharp/R3.git?path=src/R3.Unity/Assets/R3.Unity",
       "depth": 0,

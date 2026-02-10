@@ -2,7 +2,6 @@ fileFormatVersion: 2
 guid: 138fbaa7c0862904b9c5e1a7a73d1b54
 labels:
 - RoslynAnalyzer
-- SourceGenerator
 PluginImporter:
   externalObjects: {}
   serializedVersion: 3
@@ -24,14 +23,14 @@ PluginImporter:
       enabled: 0
       settings:
         Exclude Android: 1
-        Exclude Editor: 0
+        Exclude Editor: 1
         Exclude Linux64: 1
         Exclude OSXUniversal: 1
         Exclude WebGL: 1
         Exclude Win: 1
         Exclude Win64: 1
     Editor:
-      enabled: 1
+      enabled: 0
       settings:
         CPU: AnyCPU
         DefaultValueInitialized: true

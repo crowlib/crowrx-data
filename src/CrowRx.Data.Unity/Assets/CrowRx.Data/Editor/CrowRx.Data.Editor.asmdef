@@ -1,0 +1,18 @@
+{
+    "name": "CrowRx.Data.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:3ff682373c645814a81c050674acbb24"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": true
+}

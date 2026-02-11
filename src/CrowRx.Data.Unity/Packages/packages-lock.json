@@ -16,7 +16,7 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "329e8adefeef46c25c23aafb97b416c88f164470"
+      "hash": "644e48b389a4d3c08fa0856a87423e1fb1550194"
     },
     "com.cysharp.r3": {
       "version": "https://github.com/Cysharp/R3.git?path=src/R3.Unity/Assets/R3.Unity",

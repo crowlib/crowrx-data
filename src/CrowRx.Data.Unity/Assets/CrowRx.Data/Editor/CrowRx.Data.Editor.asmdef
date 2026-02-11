@@ -14,5 +14,8 @@
     "autoReferenced": true,
     "defineConstraints": [],
     "versionDefines": [],
-    "noEngineReferences": true
+    "noEngineReferences": true,
+    "analyzers": [
+        "Analyzers/CrowRx.Data.SourceGenerator.dll"
+    ]
 }

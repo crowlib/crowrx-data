@@ -12,7 +12,6 @@
     "dependencies": {
         "com.crowlib.crowrx": "1.0.0",        
         "com.cysharp.unitask": "2.5.10",
-        "com.crowlib.crowrx.common" : "1.0.0",
         "com.cysharp.r3": "1.3.0"
     }
 }

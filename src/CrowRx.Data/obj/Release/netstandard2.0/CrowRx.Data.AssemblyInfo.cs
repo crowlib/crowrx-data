@@ -14,11 +14,11 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyDescriptionAttribute("A global reactive system library for CrowRx.\r\n            This package is intende" +
     "d for use with Unity3D 6.0 or newer only.\r\n        ")]
-[assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.2.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.2+cc7da0530ae33204a2581b1de2793c3d1be62e6a")]
+[assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.3.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.3+1d8ae00e9a4e79cdb4bfdcb7ff30fa1059cc75d8")]
 [assembly: System.Reflection.AssemblyProductAttribute("CrowRx.Data")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CrowRx.Data")]
-[assembly: System.Reflection.AssemblyVersionAttribute("1.0.2.0")]
+[assembly: System.Reflection.AssemblyVersionAttribute("1.0.3.0")]
 
 // MSBuild WriteCodeFragment 클래스에서 생성되었습니다.
 

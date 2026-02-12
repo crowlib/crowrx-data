@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>CrowRx.Data.SourceGenerator</id>
+    <version>1.0.1</version>
+    <title>Source Generator For CrowRx.Data</title>
+    <authors>newhory</authors>
+    <license type="file">LICENSE</license>
+    <licenseUrl>https://aka.ms/deprecateLicenseUrl</licenseUrl>
+    <readme>README.md</readme>
+    <description>A source generator for CrowRx.Data.
+This package is intended for use with Unity3D 6.0 or newer only.</description>
+    <tags>unity unity-editor analyzer</tags>
+    <repository type="git" commit="36ab244db9ac319a4c155a466726b68a00e73282" />
+    <dependencies>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Microsoft.CodeAnalysis.CSharp" version="4.3.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

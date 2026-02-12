@@ -5,7 +5,7 @@
   },
   "projects": {
     "D:\\Project\\personal\\crowlib\\crowrx-data\\src\\CrowRx.Data\\CrowRx.Data.csproj": {
-      "version": "1.0.2",
+      "version": "1.0.3",
       "restore": {
         "projectUniqueName": "D:\\Project\\personal\\crowlib\\crowrx-data\\src\\CrowRx.Data\\CrowRx.Data.csproj",
         "projectName": "CrowRx.Data",
@@ -55,7 +55,6 @@
               "version": "[1.0.0, )"
             },
             "CrowRx.Data.SourceGenerator": {
-              "suppressParent": "All",
               "target": "Package",
               "version": "[1.0.1, )"
             },

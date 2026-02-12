@@ -9,7 +9,7 @@
         "com.cysharp.unitask": "2.5.10",
         "com.cysharp.zlinq": "1.5.4"
       },
-      "hash": "5936065a6d440b4524488b73955ead939ae74c37"
+      "hash": "dc2890949e487aeb749537ff45a832708b937669"
     },
     "com.cysharp.r3": {
       "version": "https://github.com/Cysharp/R3.git?path=src/R3.Unity/Assets/R3.Unity",

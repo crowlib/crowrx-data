@@ -1,6 +1,6 @@
-﻿# CrowRx.Data
+﻿# CrowRx
 
-A global reactive system library for CrowRx.
+A core library For CrowRx.
 
 ## Requirements
 - Unity 6.0 or newer

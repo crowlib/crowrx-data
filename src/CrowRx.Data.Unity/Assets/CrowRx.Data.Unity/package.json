@@ -1,6 +1,6 @@
 {
     "name": "com.crowlib.crowrx.data",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "displayName": "CrowRx Data",
     "author": {
         "name": "Hory",
@@ -10,7 +10,7 @@
     "description": "CrowRx global event system.",
     "category": "Scripting",
     "dependencies": {
-        "com.crowlib.crowrx": "1.0.5",        
+        "com.crowlib.crowrx": "1.0.6",        
         "com.cysharp.unitask": "2.5.10",
         "com.cysharp.r3": "1.3.0"
     }

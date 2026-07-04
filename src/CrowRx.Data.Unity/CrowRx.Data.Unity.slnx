@@ -1,4 +1,4 @@
 ﻿<Solution>
-  <Project Path="CrowRx.Data.Unity.csproj" />
   <Project Path="Assembly-CSharp.csproj" />
+  <Project Path="CrowRx.Data.Unity.csproj" />
 </Solution>

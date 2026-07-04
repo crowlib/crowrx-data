@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 using R3;
 
-
 namespace CrowRx.Data
 {
     /// <summary>
@@ -15,29 +14,28 @@ namespace CrowRx.Data
     public class Managed<TTarget> : IManaged
         where TTarget : class, ITarget, new()
     {
-    #region static
+        #region static
 
-        private static readonly Dictionary<Type, ICouple> s_targetUpdaters = new();
+        private static readonly Dictionary<Type, ICouple> _targetUpdaters = new();
 
-        private static Managed<TTarget> s_instance;
-
+        private static Managed<TTarget>? _instance;
 
         public static TTarget Instance
         {
             get
             {
-                Init();
+                Managed<TTarget> instance = Init();
 
-                return s_instance._target;
+                return instance._target;
             }
 
             set
             {
-                Init();
+                Managed<TTarget> instance = Init();
 
-                s_instance._target = value;
+                instance._target = value;
 
-                if (s_instance._target is ISource targetAsSource)
+                if (instance._target is ISource targetAsSource)
                 {
                     Broker.UpdateBy(targetAsSource);
                 }
@@ -48,25 +46,25 @@ namespace CrowRx.Data
         {
             get
             {
-                Init();
+                Managed<TTarget> instance = Init();
 
-                return s_instance._subjectTarget.Publish().RefCount();
+                return instance._subjectTarget.Publish().RefCount();
             }
         }
 
         /// <summary>
         /// only for generated code.
         /// </summary>
-        public static void Init()
+        internal static Managed<TTarget> Init()
         {
-            if (s_instance is null)
+            if (_instance is null)
             {
-                s_instance = new Managed<TTarget>(new TTarget());
+                _instance = new Managed<TTarget>(new TTarget());
 
                 foreach (
                     Type targetGenericInterfaceType
                     in
-                    s_instance._target.GetType()
+                    _instance._target.GetType()
                         .GetInterfaces()
                         .Where(interfaceType =>
                             interfaceType.IsGenericType && typeof(ITarget).IsAssignableFrom(interfaceType)))
@@ -98,21 +96,20 @@ namespace CrowRx.Data
                         continue;
                     }
 
-                    Broker.ResisterInternal(sourceType, s_instance);
+                    Broker.ResisterInternal(sourceType, _instance);
                 }
             }
 
-            if (s_instance._isDisposed)
+            if (_instance._isDisposed)
             {
-                s_instance._subjectTarget = new Subject<TTarget>();
-                s_instance._isDisposed = false;
+                _instance._subjectTarget = new Subject<TTarget>();
+                _instance._isDisposed = false;
             }
+
+            return _instance;
         }
 
-    #endregion
-
-
-    #region field
+        #endregion
 
         private readonly Type _targetType;
 
@@ -121,15 +118,7 @@ namespace CrowRx.Data
         private Subject<TTarget> _subjectTarget;
         private bool _isDisposed;
 
-    #endregion
-
-
-    #region property
-
         public ITarget Target => _target;
-
-    #endregion
-
 
         private Managed(TTarget target)
         {
@@ -139,7 +128,6 @@ namespace CrowRx.Data
             _subjectTarget = new Subject<TTarget>();
             _isDisposed = false;
         }
-
 
         /// <summary>
         /// internal use only
@@ -158,11 +146,11 @@ namespace CrowRx.Data
             _target = new TTarget();
         }
 
-    #region internal use only
+        #region internal use only
 
         void IManaged.UpdateTarget(Type sourceType, ISource source, Queue<IManaged> dataChangedManagedData)
         {
-            if (!s_targetUpdaters.TryGetValue(sourceType, out ICouple couple))
+            if (!_targetUpdaters.TryGetValue(sourceType, out ICouple couple))
             {
                 return;
             }
@@ -197,7 +185,7 @@ namespace CrowRx.Data
 
         void IManaged.UpdateTarget<TSource>(Type sourceType, in TSource source, Queue<IManaged> dataChangedManagedData)
         {
-            if (!s_targetUpdaters.TryGetValue(sourceType, out ICouple couple))
+            if (!_targetUpdaters.TryGetValue(sourceType, out ICouple couple))
             {
                 return;
             }
@@ -233,11 +221,9 @@ namespace CrowRx.Data
 
         void IManaged.OnChanged()
         {
-            Init();
-
             try
             {
-                _subjectTarget.OnNext(_target);
+                _subjectTarget?.OnNext(_target);
             }
             catch (Exception ex)
             {
@@ -245,9 +231,9 @@ namespace CrowRx.Data
             }
         }
 
-        void IManaged.AddCouple(Type sourceType, ICouple couple) => s_targetUpdaters.Add(sourceType, couple);
+        void IManaged.AddCouple(Type sourceType, ICouple couple) => _targetUpdaters.Add(sourceType, couple);
 
-    #endregion
+        #endregion
     }
 
     /// <summary>

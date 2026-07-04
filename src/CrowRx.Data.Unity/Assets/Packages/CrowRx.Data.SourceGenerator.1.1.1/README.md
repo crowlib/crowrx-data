@@ -70,10 +70,10 @@ namespace Generated {
         public static void Initialize() {
             #region generated managed
             // Initializes the target manager
-            Managed<Global.InventoryUI>.Init();
+            ForSourceGenerator.InitManaged<Global.InventoryUI>();
 
             // Maps the source to the target
-            Couple<Global.InventorySource, Global.InventoryUI>.Init();
+            ForSourceGenerator.InitCouple<Global.InventorySource, Global.InventoryUI>();
             #endregion
         }
     }

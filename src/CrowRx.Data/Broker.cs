@@ -2,49 +2,49 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-
 namespace CrowRx.Data
 {
-    /// <summary>
-    /// 사용 가능 : <see cref="Release"/>, UpdateBy().
-    /// 그 외 구성 요소는 외부 사용 금지.
-    /// </summary>
-    public class Broker
+    public static class Broker
     {
-        private static readonly Dictionary<Type, List<IManaged>> s_managedData = new();
+        private static readonly Dictionary<Type, List<IManaged>> _managedData = new();
 
-        private static readonly Stack<Queue<IManaged>> s_tempManagedBuffer = new();
+        private static Stack<Queue<IManaged>>? _tempManagedBuffer;
 
-
-        static Broker()
+        public static void Dispose()
         {
-            s_tempManagedBuffer.Push(new Queue<IManaged>(1));
-        }
-
-
-        public static void Release()
-        {
-            foreach (IManaged managed in s_managedData.Values.SelectMany(managedData => managedData))
+            foreach (IManaged managed in _managedData.Values.SelectMany(managedData => managedData))
             {
                 managed.Dispose();
             }
         }
 
+        public static void Release()
+        {
+            Dispose();
+
+            _tempManagedBuffer?.Clear();
+            _tempManagedBuffer = null;
+
+            _managedData.Clear();
+        }
+
         public static TTarget[] All<TTarget>() where TTarget : ITarget =>
-            s_managedData
+            _managedData
                 .SelectMany(pair => pair.Value)
                 .Where(managed => managed.Target is TTarget)
                 .Select(managed => managed.Target)
                 .Cast<TTarget>()
                 .ToArray();
 
+        /// <summary>
+        /// 기본 사용 권장. Boxing/Unboxing이 발생하지 않음.
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <param name="source"></param>
         public static void UpdateBy<TSource>(in TSource source)
             where TSource : ISource
         {
-            Queue<IManaged> changedManagedData =
-                s_tempManagedBuffer.Count > 0
-                    ? s_tempManagedBuffer.Pop()
-                    : new Queue<IManaged>();
+            Queue<IManaged> changedManagedData = GetManagedDataQueue();
 
             UpdateByInternal(in source, changedManagedData);
 
@@ -53,17 +53,12 @@ namespace CrowRx.Data
                 changedManaged.OnChanged();
             }
 
-            changedManagedData.Clear();
-
-            s_tempManagedBuffer.Push(changedManagedData);
+            ReturnManagedDataQueue(changedManagedData);
         }
 
         public static void UpdateBy(ISource source)
         {
-            Queue<IManaged> changedManagedData =
-                s_tempManagedBuffer.Count > 0
-                    ? s_tempManagedBuffer.Pop()
-                    : new Queue<IManaged>();
+            Queue<IManaged> changedManagedData = GetManagedDataQueue();
 
             UpdateByInternal(source, changedManagedData);
 
@@ -72,44 +67,14 @@ namespace CrowRx.Data
                 changedManaged.OnChanged();
             }
 
-            changedManagedData.Clear();
-
-            s_tempManagedBuffer.Push(changedManagedData);
+            ReturnManagedDataQueue(changedManagedData);
         }
 
-        /// <summary>
-        /// GC가 발생하니 되도록 사용하지 말 것. 특히 매프레임 또는 자주 호출되는 곳에서는 사용 금지.
-        /// 다른 UpdateBy 사용 권장.
-        /// </summary>
-        /// <param name="sources"></param>
-        public static void UpdateBy(params ISource[] sources)
-        {
-            Queue<IManaged> changedManagedData =
-                s_tempManagedBuffer.Count > 0
-                    ? s_tempManagedBuffer.Pop()
-                    : new Queue<IManaged>();
-
-            foreach (ISource source in sources)
-            {
-                UpdateByInternal(source, changedManagedData);
-            }
-
-            foreach (IManaged changedManaged in changedManagedData)
-            {
-                changedManaged.OnChanged();
-            }
-
-            changedManagedData.Clear();
-
-            s_tempManagedBuffer.Push(changedManagedData);
-        }
+        public static void UpdateBy(params ISource[] sources) => UpdateBy(sources, sources.Length);
 
         public static void UpdateBy(ISource[] sources, int count)
         {
-            Queue<IManaged> changedManagedData =
-                s_tempManagedBuffer.Count > 0
-                    ? s_tempManagedBuffer.Pop()
-                    : new Queue<IManaged>();
+            Queue<IManaged> changedManagedData = GetManagedDataQueue();
 
             for (int i = 0; i < count; i++)
             {
@@ -121,17 +86,12 @@ namespace CrowRx.Data
                 changedManaged.OnChanged();
             }
 
-            changedManagedData.Clear();
-
-            s_tempManagedBuffer.Push(changedManagedData);
+            ReturnManagedDataQueue(changedManagedData);
         }
 
-        public static void UpdateBy(in ICollection<ISource> sources)
+        public static void UpdateBy(ICollection<ISource> sources)
         {
-            Queue<IManaged> changedManagedData =
-                s_tempManagedBuffer.Count > 0
-                    ? s_tempManagedBuffer.Pop()
-                    : new Queue<IManaged>();
+            Queue<IManaged> changedManagedData = GetManagedDataQueue();
 
             foreach (ISource source in sources)
             {
@@ -143,25 +103,20 @@ namespace CrowRx.Data
                 changedManaged.OnChanged();
             }
 
-            changedManagedData.Clear();
-
-            s_tempManagedBuffer.Push(changedManagedData);
+            ReturnManagedDataQueue(changedManagedData);
         }
 
-    #region internal use only
+        internal static bool TryGetManagedData(Type sourceType, out List<IManaged> managedData) => _managedData.TryGetValue(sourceType, out managedData);
 
-        internal static bool TryGetManagedData(Type sourceType, out List<IManaged> managedData) =>
-            s_managedData.TryGetValue(sourceType, out managedData);
-
-        internal static bool ContainsSourceType(Type sourceType) => s_managedData.ContainsKey(sourceType);
+        internal static bool ContainsSourceType(Type sourceType) => _managedData.ContainsKey(sourceType);
 
         internal static void ResisterInternal(Type sourceType, IManaged managed)
         {
-            if (!s_managedData.TryGetValue(sourceType, out List<IManaged> managedData))
+            if (!_managedData.TryGetValue(sourceType, out List<IManaged> managedData))
             {
                 managedData = new List<IManaged>();
 
-                s_managedData.Add(sourceType, managedData);
+                _managedData.Add(sourceType, managedData);
             }
 
             if (!managedData.Contains(managed))
@@ -176,7 +131,7 @@ namespace CrowRx.Data
 
             do
             {
-                if (s_managedData.TryGetValue(sourceType, out List<IManaged> managedData))
+                if (_managedData.TryGetValue(sourceType, out List<IManaged> managedData))
                 {
                     foreach (IManaged managed in managedData)
                     {
@@ -195,7 +150,7 @@ namespace CrowRx.Data
 
             do
             {
-                if (s_managedData.TryGetValue(sourceType, out List<IManaged> managedData))
+                if (_managedData.TryGetValue(sourceType, out List<IManaged> managedData))
                 {
                     foreach (IManaged managed in managedData)
                     {
@@ -207,6 +162,18 @@ namespace CrowRx.Data
             } while (sourceType is not null && typeof(ISource).IsAssignableFrom(sourceType));
         }
 
-    #endregion
+        private static Queue<IManaged> GetManagedDataQueue()
+        {
+            _tempManagedBuffer ??= new Stack<Queue<IManaged>>();
+
+            return _tempManagedBuffer.Count > 0 ? _tempManagedBuffer.Pop() : new Queue<IManaged>();
+        }
+
+        private static void ReturnManagedDataQueue(Queue<IManaged> queue)
+        {
+            queue.Clear();
+
+            _tempManagedBuffer?.Push(queue);
+        }
     }
 }

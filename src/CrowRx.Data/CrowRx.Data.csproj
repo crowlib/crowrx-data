@@ -7,7 +7,7 @@
 
         <!-- NuGet -->
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <VersionPrefix>1.0.6</VersionPrefix>
+        <VersionPrefix>1.1.2</VersionPrefix>
 
         <!-- Native 방지 -->
         <UseNativeCompilation>false</UseNativeCompilation>
@@ -33,7 +33,7 @@
     <ItemGroup>
         <PackageReference Include="CrowRx.Core" Version="1.0.6"/>
         <PackageReference Include="R3" Version="1.3.0"/>
-        <PackageReference Include="CrowRx.Data.SourceGenerator" Version="1.0.2"/>
+        <PackageReference Include="CrowRx.Data.SourceGenerator" Version="1.1.1"/>
     </ItemGroup>
 
     <ItemGroup>

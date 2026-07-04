@@ -26,7 +26,7 @@ namespace CrowRx.Data
         private static Couple<TSource, TTarget>? s_instance;
 
 
-        public static void Init()
+        internal static void Init()
         {
             if (s_instance is not null)
             {

@@ -25,7 +25,6 @@ namespace CrowRx.Data
     {
         private static Couple<TSource, TTarget>? s_instance;
 
-
         internal static void Init()
         {
             if (s_instance is not null)
@@ -51,6 +50,7 @@ namespace CrowRx.Data
             }
         }
 
+        internal static void DisposeAll() => s_instance = null;
 
         bool ICouple.UpdateTargetBySource(ISource source, ITarget target) => ((TTarget)target).UpdateBy((TSource)source);
         bool ICouple<TSource>.UpdateTargetBySource(in TSource source, ITarget target) => ((TTarget)target).UpdateBy(source);

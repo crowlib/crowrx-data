@@ -7,25 +7,14 @@ namespace CrowRx.Data
     public static class Broker
     {
         private static readonly Dictionary<Type, List<IManaged>> _managedData = new();
+        private static readonly Stack<Queue<IManaged>> _tempManagedBuffer = new();
 
-        private static Stack<Queue<IManaged>>? _tempManagedBuffer;
-
-        public static void Dispose()
+        public static void UnsubscribeAll()
         {
             foreach (IManaged managed in _managedData.Values.SelectMany(managedData => managedData))
             {
-                managed.Dispose();
+                managed.Unsubscribe();
             }
-        }
-
-        public static void Release()
-        {
-            Dispose();
-
-            _tempManagedBuffer?.Clear();
-            _tempManagedBuffer = null;
-
-            _managedData.Clear();
         }
 
         public static TTarget[] All<TTarget>() where TTarget : ITarget =>
@@ -162,18 +151,13 @@ namespace CrowRx.Data
             } while (sourceType is not null && typeof(ISource).IsAssignableFrom(sourceType));
         }
 
-        private static Queue<IManaged> GetManagedDataQueue()
-        {
-            _tempManagedBuffer ??= new Stack<Queue<IManaged>>();
-
-            return _tempManagedBuffer.Count > 0 ? _tempManagedBuffer.Pop() : new Queue<IManaged>();
-        }
+        private static Queue<IManaged> GetManagedDataQueue() => _tempManagedBuffer.Count > 0 ? _tempManagedBuffer.Pop() : new Queue<IManaged>();
 
         private static void ReturnManagedDataQueue(Queue<IManaged> queue)
         {
             queue.Clear();
 
-            _tempManagedBuffer?.Push(queue);
+            _tempManagedBuffer.Push(queue);
         }
     }
 }

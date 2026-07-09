@@ -17,20 +17,20 @@ namespace CrowRx.Data
         #region static
 
         private static readonly Dictionary<Type, ICouple> _targetUpdaters = new();
+        private static readonly Type _targetType;
 
         private static Managed<TTarget>? _instance;
 
         public static TTarget Instance
         {
-            get
-            {
-                Managed<TTarget> instance = Init();
-
-                return instance._target;
-            }
-
+            get => Init()._target;
             set
             {
+                if (value.GetType() != _targetType)
+                {
+                    return;
+                }
+
                 Managed<TTarget> instance = Init();
 
                 instance._target = value;
@@ -48,13 +48,33 @@ namespace CrowRx.Data
             {
                 Managed<TTarget> instance = Init();
 
+                if (instance._subjectTarget.IsDisposed)
+                {
+                    instance._subjectTarget = new Subject<TTarget>();
+                }
+
                 return instance._subjectTarget.Publish().RefCount();
             }
         }
 
-        /// <summary>
-        /// only for generated code.
-        /// </summary>
+        static Managed()
+        {
+            _targetType = typeof(TTarget);
+        }
+
+        #endregion
+
+        private TTarget _target;
+        private Subject<TTarget> _subjectTarget;
+
+        private Managed(TTarget target)
+        {
+            _target = target;
+            _subjectTarget = new Subject<TTarget>();
+        }
+
+        #region internal use only
+
         internal static Managed<TTarget> Init()
         {
             if (_instance is null)
@@ -100,53 +120,18 @@ namespace CrowRx.Data
                 }
             }
 
-            if (_instance._isDisposed)
-            {
-                _instance._subjectTarget = new Subject<TTarget>();
-                _instance._isDisposed = false;
-            }
-
             return _instance;
         }
 
-        #endregion
-
-        private readonly Type _targetType;
-
-        private TTarget _target;
-
-        private Subject<TTarget> _subjectTarget;
-        private bool _isDisposed;
-
-        public ITarget Target => _target;
-
-        private Managed(TTarget target)
+        internal static void DisposeAll()
         {
-            _target = target;
-            _targetType = _target.GetType();
+            _targetUpdaters.Clear();
 
-            _subjectTarget = new Subject<TTarget>();
-            _isDisposed = false;
+            (_instance as IManaged)?.Unsubscribe();
+            _instance = null;
         }
 
-        /// <summary>
-        /// internal use only
-        /// </summary>
-        public void Dispose()
-        {
-            if (_isDisposed)
-            {
-                return;
-            }
-
-            _isDisposed = true;
-
-            _subjectTarget.Dispose();
-
-            _target = new TTarget();
-        }
-
-        #region internal use only
+        ITarget IManaged.Target => _target;
 
         void IManaged.UpdateTarget(Type sourceType, ISource source, Queue<IManaged> dataChangedManagedData)
         {
@@ -233,16 +218,25 @@ namespace CrowRx.Data
 
         void IManaged.AddCouple(Type sourceType, ICouple couple) => _targetUpdaters.Add(sourceType, couple);
 
+        void IManaged.Unsubscribe()
+        {
+            if (_subjectTarget.IsDisposed)
+            {
+                return;
+            }
+
+            _subjectTarget.Dispose();
+        }
+
         #endregion
     }
 
     /// <summary>
     /// internal use only
     /// </summary>
-    internal interface IManaged : IDisposable
+    internal interface IManaged
     {
         ITarget Target { get; }
-
 
         /// <summary>
         /// internal use only
@@ -260,5 +254,7 @@ namespace CrowRx.Data
         /// internal use only
         /// </summary>
         void AddCouple(Type sourceType, ICouple couple);
+
+        void Unsubscribe();
     }
 }
